@@ -1,0 +1,420 @@
+Key Technologies
+React 18+: For building the user interface
+TypeScript: For type safety and better developer experience
+Vite: As the build tool and development server
+TanStack Query (React Query): For data fetching, caching, and state management
+Tailwind CSS: For styling with utility classes
+Shadcn UI: For pre-built accessible component primitives
+Wouter: Lightweight routing library
+UI Component Library
+The application uses a modified version of Shadcn UI with components like:
+
+Form controls (inputs, selects, checkboxes)
+Navigation components (navbar, sidebar)
+Cards for displaying facility information
+Modals and dialogs for interactions
+Toast notifications for user feedback
+Theme Configuration
+Customized through theme.json with a design system of:
+Primary color: Blue-based scheme (#2563EB)
+Secondary colors: Gray scale for text and backgrounds
+Border radius: 0.5rem for a modern but conservative look
+Professional appearance mode
+Frontend Pages
+1. Home Page (/)
+Hero Section: High-impact introduction with search functionality
+City Selector: Visual grid of Colorado cities with images
+Service Type Cards: Cards displaying different care types (Assisted Living, Memory Care, etc.)
+Featured Facilities: Carousel of top-rated facilities
+Guide Section: Brief explanation of how to use the platform
+Testimonials: User feedback and success stories
+Call-to-Action: Quiz or contact prompts
+2. Facilities List Page (/facilities)
+Search Bar: For filtering by name or features
+Filter Panel:
+Service type selection (dropdown)
+Rating filter (star rating selector)
+Price range slider
+Amenities checkboxes
+Sort Controls: Options for sorting by rating, name, or price
+Facility Cards:
+Facility image
+Name and basic info
+Service type badge
+Star rating
+Short description
+"View Details" button
+Pagination: For navigating large result sets
+Map View Toggle: Switch between list and map views
+3. City-Specific Page (/cities/:slug)
+City Header: City name, image, and brief description
+City Stats: Number of facilities, average ratings
+Tabs:
+All Facilities
+Assisted Living
+Memory Care
+Nursing Homes
+Independent Living
+Local Resources Section: City-specific senior resources
+Similar Cities: Suggestions for nearby locations
+4. Facility Details Page (/facilities/:id)
+Image Gallery: Facility photos with lightbox viewer
+Key Information Panel:
+Name and address
+Phone and website links
+Service type badges
+Price range indicator
+Overall rating
+Quick Action Buttons:
+Schedule tour
+Save to favorites
+Share facility
+Description Tab: Detailed facility description
+Amenities Tab: Comprehensive amenities list with icons
+Services Tab: Available care services
+Reviews Tab: User reviews with rating breakdown
+Location Tab: Map and directions
+Similar Facilities: Cards showing similar options nearby
+5. Resources Page (/resources)
+Resource Categories:
+Care Guides
+Financial Resources
+Medicare Information
+Legal Planning
+Health Resources
+Resource Cards: Link cards with descriptions
+City-Specific Resources: Dynamic section that changes based on selected city
+6. Quiz Page (/quiz)
+Multi-step Form:
+Care needs assessment
+Location preferences
+Budget considerations
+Timeline questions
+Contact information collection
+Progress Indicator: Shows completion percentage
+Results Preview: Shows potential matches before form submission
+7. About Us Page (/about)
+Company Mission: Mission statement and values
+Team Section: Team member cards with photos and bios
+History Timeline: Company history visualization
+Testimonials: Client success stories
+8. Contact Page (/contact)
+Contact Form: With validation
+Contact Information: Phone, email, address
+FAQ Section: Common questions and answers
+Office Hours: Business hours information
+9. AI Chat Interface (/ai-assistant)
+Chat Interface: Message bubbles for conversation
+Quick Question Buttons: Common questions to ask
+Context Awareness: Remembers previous conversations
+Resource Linking: Links to relevant facilities based on conversation
+State Management
+React Query: Manages API data fetching, caching, and synchronization
+Custom hooks for each entity type (useFacilities, useCity, etc.)
+Optimistic updates for form submissions
+Automatic refetching and cache invalidation
+React Context: For global application state
+User preferences
+Search filters
+Recently viewed facilities
+Quiz progress
+Frontend Data Flow
+Components request data through custom hooks
+Hooks use React Query to fetch from API endpoints
+Data is cached based on query keys
+UI updates reactively when data changes
+Mutations update the server and invalidate relevant caches
+API Structure
+RESTful API Endpoints
+Facilities Endpoints
+Get All Facilities
+
+GET /api/facilities
+Query Parameters:
+type: Filter by service type (ASSISTED_LIVING, MEMORY_CARE, etc.)
+city: Filter by city name
+rating: Filter by minimum rating
+search: Text search across facility fields
+sort: Sort order (rating, name, price)
+relevant: Only show AI-verified relevant facilities
+Response: Array of facility objects with basic information
+Get Facility by ID
+
+GET /api/facilities/:id
+Response: Detailed facility object including:
+Basic information (name, address, contact)
+Service details and pricing
+Amenities and features
+Coordinates for mapping
+Images and virtual tour links
+Staff information
+Get Facility Reviews
+
+GET /api/facilities/:id/reviews
+Query Parameters:
+sort: Sort order (date, rating)
+limit: Number of reviews to return
+Response: Array of review objects with:
+Rating (1-5 stars)
+Review text
+Author information
+Date posted
+Helpful votes count
+Get Facility Screenshots
+
+GET /api/facilities/:id/screenshots
+Response: Array of screenshot URLs
+Get Extracted Images
+
+GET /api/facilities/:id/extracted-images
+Response: Array of images extracted from facility website
+City Endpoints
+Get All Cities
+
+GET /api/cities
+Response: Array of city objects with:
+Name and slug
+State
+Description
+Image URL
+Facility count
+Get City by Slug
+
+GET /api/cities/:slug
+Response: Detailed city object including:
+Basic information
+Featured facilities
+Local resources
+Coordinates for mapping
+Get City Resources
+
+GET /api/cities/:slug/resources/:resourceType
+Path Parameters:
+resourceType: Type of resources (healthcare, transportation, financial, etc.)
+Response: AI-generated resource information specific to the city
+Resource Endpoints
+Get Resource Links
+GET /api/resources/:category
+Path Parameters:
+category: Resource category (care-guide, financial, medicare, legal, planning)
+Response: Array of resource link objects with:
+Title
+Description
+URL
+Category
+Icon
+AI Chat Endpoints
+Create Chat Session
+
+GET /api/ai/session
+Response: New chat session object with:
+Session ID
+Initial greeting message
+Timestamp
+Get Chat Session
+
+GET /api/ai/session/:sessionId
+Response: Existing chat session with message history
+Send Chat Message
+
+POST /api/ai/chat
+Request Body:
+Session ID
+User message
+Response: AI response message with:
+Text content
+Suggested facilities (if relevant)
+Resource links (if relevant)
+Image Management Endpoints
+Get Images by Entity
+
+GET /api/images/:entityType/:entityId
+Path Parameters:
+entityType: Type of entity (facility, city)
+entityId: ID of the entity
+Response: Array of image objects
+Upload Image
+
+POST /api/images/upload
+Request Body: Multipart form with:
+Image file
+Entity type
+Entity ID
+Caption
+Response: Uploaded image object with URL
+Quiz and Lead Endpoints
+Submit Quiz Answers
+POST /api/quiz/submit
+Request Body:
+User care preferences
+Contact information
+Location preferences
+Response: Matched facilities and lead confirmation
+Data Models
+Facility Model
+interface Facility {
+  id: number;
+  placeId: string | null;
+  name: string;
+  slug: string;
+  description: string | null;
+  shortDescription: string | null;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  phone: string | null;
+  website: string | null;
+  email: string | null;
+  serviceType: ServiceType;
+  rating: number | null;
+  reviewCount: number | null;
+  pricing: PricingInfo | null;
+  amenities: string[];
+  services: string[];
+  imageUrl: string | null;
+  imageUrls: string[];
+  latitude: number | null;
+  longitude: number | null;
+  isFeatured: boolean;
+  isRelevant: boolean | null;
+  relevanceAnalysis: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+City Model
+interface City {
+  id: number;
+  name: string;
+  slug: string;
+  state: string;
+  description: string;
+  imageUrl: string | null;
+  facilityCount: number;
+  latitude: number | null;
+  longitude: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+Review Model
+interface Review {
+  id: number;
+  facilityId: number;
+  reviewerId: string | null;
+  reviewerName: string | null;
+  rating: number;
+  text: string | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+}
+Image Model
+interface Image {
+  id: number;
+  entityType: string;
+  entityId: string;
+  url: string;
+  caption: string | null;
+  sortOrder: number;
+  isDefault: boolean;
+  createdAt: Date;
+}
+AI Chat Model
+interface AiChat {
+  id: number;
+  sessionId: string;
+  userId: string | null;
+  messages: Message[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+Quiz Lead Model
+interface QuizLead {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  careType: string;
+  budget: string | null;
+  timeframe: string | null;
+  locationPreference: string | null;
+  additionalNotes: string | null;
+  contacted: boolean;
+  createdAt: Date;
+}
+Frontend-API Integration
+Data Fetching Pattern
+// Example React Query hook for facilities
+function useFacilities(filters) {
+  return useQuery({
+    queryKey: ['/api/facilities', filters],
+    queryFn: () => apiRequest(`/api/facilities`, { params: filters }),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+// Example component using the hook
+function FacilityList({ citySlug, serviceType }) {
+  const { data, isLoading, error } = useFacilities({ 
+    city: citySlug, 
+    type: serviceType 
+  });
+  
+  if (isLoading) return <LoadingSkeleton />;
+  if (error) return <ErrorDisplay error={error} />;
+  
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {data.map(facility => (
+        <FacilityCard key={facility.id} facility={facility} />
+      ))}
+    </div>
+  );
+}
+Form Submission Pattern
+// Example mutation hook
+function useSubmitReview() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (review) => apiRequest('/api/reviews', {
+      method: 'POST',
+      data: review,
+    }),
+    onSuccess: (data, variables) => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(['/api/facilities', variables.facilityId, 'reviews']);
+      toast({
+        title: "Review submitted",
+        description: "Thank you for your feedback!",
+      });
+    },
+  });
+}
+// Example form component
+function ReviewForm({ facilityId }) {
+  const form = useForm({
+    resolver: zodResolver(reviewSchema),
+    defaultValues: { rating: 0, text: '' },
+  });
+  
+  const { mutate, isPending } = useSubmitReview();
+  
+  function onSubmit(data) {
+    mutate({ ...data, facilityId });
+  }
+  
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        {/* Form fields */}
+        <Button type="submit" disabled={isPending}>
+          {isPending ? 'Submitting...' : 'Submit Review'}
+        </Button>
+      </form>
+    </Form>
+  );
+}

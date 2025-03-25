@@ -1,0 +1,739 @@
+The platform categorizes facilities into the following service types:
+
+Assisted Living (ASSISTED_LIVING)
+
+For seniors who need help with daily activities but maintain some independence
+Typical services: meal preparation, medication management, bathing assistance
+Average monthly cost range in Colorado: $3,500-$6,500
+Memory Care (MEMORY_CARE)
+
+Specialized care for those with Alzheimer's, dementia, or other memory conditions
+Enhanced security features, specialized training for staff
+Structured activities designed for cognitive stimulation
+Average monthly cost range in Colorado: $5,500-$8,500
+Nursing Home (NURSING_HOME)
+
+24/7 medical supervision and skilled nursing care
+For seniors with complex medical needs requiring professional medical attention
+Services include rehabilitation, wound care, IV therapy
+Average monthly cost range in Colorado: $7,500-$11,000
+Independent Living (INDEPENDENT_LIVING)
+
+For active seniors who can live independently but want community and amenities
+Minimal assistance, focus on social activities and maintenance-free living
+Average monthly cost range in Colorado: $2,500-$5,000
+Continuing Care Retirement Community (CCRC)
+
+Campus with multiple levels of care allowing residents to transition as needs change
+Often requires entrance fee plus monthly costs
+Average entrance fee range: $100,000-$500,000
+Average monthly cost range: $3,000-$6,000
+Adult Day Care (ADULT_DAY_CARE)
+
+Daytime supervision and activities for seniors who live with family
+Typically weekday hours (8am-5pm)
+Average daily cost range: $60-$120
+In-Home Care (HOME_CARE)
+
+Services provided in the senior's own home
+Can include personal care, housekeeping, meal prep, companionship
+Average hourly cost range: $25-$40
+Respite Care (RESPITE_CARE)
+
+Short-term care to give primary caregivers a break
+Can be provided in-home or at facilities
+Average daily cost range: $150-$300
+Hospice Care (HOSPICE)
+
+End-of-life care focused on comfort and quality of life
+Often covered by Medicare
+Can be provided in home, hospice centers, or facilities
+Rehabilitation Centers (REHABILITATION)
+
+Short-term intensive therapy following surgery, injury, or illness
+Physical, occupational, and speech therapy
+Average daily cost range: $300-$600
+Colorado Cities Coverage
+The platform focuses on the Colorado Front Range metropolitan areas with emphasis on these primary cities:
+
+Denver
+
+Population: ~715,000
+Contains ~45 senior care facilities
+Notable neighborhoods: Cherry Creek, Washington Park, LoDo
+Average facility rating: 4.1/5
+Aurora
+
+Population: ~380,000
+Contains ~30 senior care facilities
+Notable areas: Southlands, Lowry, Fitzsimmons
+Average facility rating: 3.9/5
+Colorado Springs
+
+Population: ~480,000
+Contains ~35 senior care facilities
+Notable areas: Broadmoor, Old North End, Briargate
+Average facility rating: 4.2/5
+Fort Collins
+
+Population: ~170,000
+Contains ~20 senior care facilities
+Notable areas: Old Town, University District
+Average facility rating: 4.3/5
+Boulder
+
+Population: ~108,000
+Contains ~15 senior care facilities
+Notable areas: Pearl Street, North Boulder, South Boulder
+Average facility rating: 4.4/5
+Lakewood
+
+Population: ~156,000
+Contains ~18 senior care facilities
+Notable areas: Belmar, Green Mountain
+Average facility rating: 4.0/5
+Thornton
+
+Population: ~140,000
+Contains ~12 senior care facilities
+Notable areas: Eastlake, The Grove
+Average facility rating: 3.8/5
+Arvada
+
+Population: ~120,000
+Contains ~15 senior care facilities
+Notable areas: Olde Town, Candelas
+Average facility rating: 4.1/5
+Westminster
+
+Population: ~115,000
+Contains ~14 senior care facilities
+Notable areas: The Orchard, Legacy Ridge
+Average facility rating: 3.9/5
+Centennial
+
+Population: ~110,000
+Contains ~12 senior care facilities
+Notable areas: Southglenn, Willow Creek
+Average facility rating: 4.2/5
+Pueblo
+
+Population: ~112,000
+Contains ~10 senior care facilities
+Notable areas: Union Avenue Historic District, Mesa Junction
+Average facility rating: 3.7/5
+Highlands Ranch
+
+Population: ~105,000
+Contains ~8 senior care facilities
+Notable areas: Town Center, Westridge
+Average facility rating: 4.3/5
+Greeley
+
+Population: ~108,000
+Contains ~12 senior care facilities
+Notable areas: Downtown, UNC Campus
+Average facility rating: 3.8/5
+Longmont
+
+Population: ~98,000
+Contains ~10 senior care facilities
+Notable areas: Downtown, Prospect
+Average facility rating: 4.1/5
+Loveland
+
+Population: ~78,000
+Contains ~12 senior care facilities
+Notable areas: Downtown, Centerra
+Average facility rating: 4.2/5
+Additional smaller cities with coverage include: Brighton, Castle Rock, Commerce City, Englewood, Golden, Lafayette, Littleton, Northglenn, Parker, and Wheat Ridge.
+
+Apify Integration Details
+Apify Configuration
+API Token: Stored in environment variable APIFY_API_TOKEN
+API Endpoint: https://api.apify.com/v2/
+Actor ID: crawler-google-places (Google Places Scraper)
+Run Options:
+maxCrawlPages: 25 (default)
+maxPageRetries: 3
+includeReviews: true
+includeImages: true
+language: "en"
+maxReviews: 20
+exportPlaceUrls: true
+maxConcurrency: 10
+Data Import Flow
+Setup Search Terms:
+
+export const serviceTypeSearches = {
+  "ASSISTED_LIVING": ["assisted living facilities", "senior living"],
+  "MEMORY_CARE": ["memory care facilities", "alzheimer's care"],
+  "NURSING_HOME": ["nursing homes", "skilled nursing facility"],
+  "INDEPENDENT_LIVING": ["independent living communities", "retirement communities"],
+  "ADULT_DAY_CARE": ["adult day care centers", "senior day programs"],
+  "HOME_CARE": ["home care agencies", "senior home care"],
+  "CCRC": ["continuing care retirement communities", "life care communities"],
+  "RESPITE_CARE": ["respite care", "short term senior care"],
+  "HOSPICE": ["hospice care", "palliative care services"],
+  "REHABILITATION": ["rehabilitation centers", "senior rehabilitation"]
+};
+Search Configuration
+
+// Example search configuration
+const searchParams = {
+  searchStrings: ["assisted living facilities in Denver, CO"],
+  locationQuery: "Denver, Colorado",
+  maxPlaces: 20
+};
+API Request Pattern
+
+async function runGoogleMapsScraper(
+  searchTerms: string[],
+  location: string,
+  maxPlaces: number = 10,
+  bypassCache: boolean = false
+): Promise<ApifyGoogleMapsData[]> {
+  // Generate cache key
+  const cacheKey = generateGoogleMapsSearchCacheKey(searchTerms, location, maxPlaces);
+  
+  // Check cache if not bypassing
+  if (!bypassCache) {
+    const cachedData = apifyCache.get(cacheKey);
+    if (cachedData) return cachedData;
+  }
+  
+  // Run Apify actor
+  const runId = await runApifyActor({
+    actorId: 'crawler-google-places',
+    input: {
+      searchStrings: searchTerms.map(term => `${term} in ${location}`),
+      maxCrawlPages: maxPlaces > 5 ? 25 : 10,
+      includeReviews: true,
+      includeImages: true,
+      language: "en",
+      maxReviews: 20,
+      exportPlaceUrls: true
+    }
+  });
+  
+  // Poll until finished
+  const { status, datasetId } = await pollApifyRunUntilFinished(
+    'crawler-google-places',
+    runId.id
+  );
+  
+  // Get dataset items
+  const data = await getApifyDatasetItems<ApifyGoogleMapsData>(datasetId);
+  
+  // Cache the results
+  apifyCache.set(cacheKey, data);
+  
+  return data;
+}
+Data Processing
+
+// Data mapping example
+export async function mapApifyDataToFacility(
+  apifyData: ApifyGoogleMapsData, 
+  serviceType?: string
+): Promise<InsertFacility> {
+  // Use detection logic or override with specified service type
+  const detectedType = serviceType || mapFacilityType(apifyData.categories || []);
+  
+  // Extract amenities, features
+  const amenities = extractAmenities(apifyData);
+  const accessibilityFeatures = extractAccessibilityFeatures(apifyData);
+  
+  // Generate a short description
+  const shortDesc = createShortDescription(apifyData);
+  
+  // Map to our facility model
+  const facility: InsertFacility = {
+    placeId: apifyData.placeId,
+    name: apifyData.title,
+    slug: slugify(apifyData.title),
+    address: apifyData.address || "",
+    city: apifyData.city || "",
+    state: apifyData.state || "CO",
+    zipCode: apifyData.postalCode || "",
+    phone: apifyData.phone || null,
+    website: apifyData.website || null,
+    serviceType: detectedType as ServiceType,
+    rating: apifyData.totalScore || null,
+    reviewCount: apifyData.reviewsCount || null,
+    description: apifyData.description || null,
+    shortDescription: shortDesc,
+    amenities: amenities,
+    services: [],
+    imageUrl: apifyData.imageUrl || null,
+    imageUrls: (apifyData.imageUrls || []).slice(0, 5),
+    latitude: apifyData.location?.lat || null,
+    longitude: apifyData.location?.lng || null,
+    // Default values
+    isFeatured: false,
+    isRelevant: null,
+    relevanceAnalysis: null
+  };
+  
+  return facility;
+}
+Review Processing
+
+export function mapApifyReviewsToReviews(apifyData: ApifyGoogleMapsData): InsertReview[] {
+  if (!apifyData.reviews || !apifyData.reviews.length) return [];
+  
+  return apifyData.reviews
+    .filter(review => review.stars !== null)
+    .map(review => ({
+      facilityId: 0, // Will be populated after facility is created
+      reviewerId: review.reviewerId || null,
+      reviewerName: review.reviewerName || review.name || null,
+      rating: review.stars || 0,
+      text: review.text || null,
+      publishedAt: review.publishedAtDate ? new Date(review.publishedAtDate) : null
+    }));
+}
+Data Structure Details
+Facility Data Structure (Extended)
+interface Facility {
+  id: number;
+  placeId: string | null;
+  name: string;
+  slug: string;
+  description: string | null;
+  shortDescription: string | null;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  phone: string | null;
+  website: string | null;
+  email: string | null;
+  serviceType: ServiceType;
+  rating: number | null;
+  reviewCount: number | null;
+  pricing: PricingInfo | null;
+  amenities: string[];
+  services: string[];
+  accessibility: string[];
+  imageUrl: string | null;
+  imageUrls: string[];
+  latitude: number | null;
+  longitude: number | null;
+  isFeatured: boolean;
+  isRelevant: boolean | null;
+  relevanceAnalysis: string | null;
+  virtualTourUrl: string | null;
+  capacity: number | null;
+  medicareAccepted: boolean | null;
+  medicaidAccepted: boolean | null;
+  vaAccepted: boolean | null;
+  ltcInsuranceAccepted: boolean | null;
+  privatePay: boolean | null;
+  staffingRatio: string | null;
+  yearEstablished: number | null;
+  licensingInfo: string | null;
+  parkingOptions: string[] | null;
+  transportation: boolean | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+interface PricingInfo {
+  baseMonthlyRate: number | null;
+  baseMonthlyMin: number | null;
+  baseMonthlyMax: number | null;
+  entryFee: number | null;
+  respiteRate: number | null;
+  respiteDailyMin: number | null;
+  respiteDailyMax: number | null;
+  levels: {
+    level: string;
+    description: string;
+    monthlyCost: number | null;
+  }[] | null;
+  additionalFees: {
+    description: string;
+    cost: number;
+    frequency: string;
+  }[] | null;
+}
+Common Facility Amenities
+The application tracks these specific amenities for filtering:
+
+Fitness Center
+Swimming Pool
+Beauty Salon/Barber
+Restaurant-Style Dining
+Private Dining Room
+Cafe/Bistro
+Library
+Game Room
+Computer Center
+Arts & Crafts Studio
+Theater/Movie Room
+Chapel/Religious Services
+Gardens/Outdoor Spaces
+Walking Paths
+Pet-Friendly
+Guest Accommodations
+Transportation Services
+Concierge Services
+Housekeeping
+Laundry Services
+24-Hour Security
+Emergency Call System
+Wellness Programs
+Physical Therapy On-Site
+Occupational Therapy On-Site
+Speech Therapy On-Site
+Medication Management
+On-Site Medical Staff
+On-Site Medical Clinic
+Detailed Frontend Component Structure
+Core UI Components
+/client/components/
+├── common/
+│   ├── Header.tsx                # Site header with navigation
+│   ├── Footer.tsx                # Site footer with links
+│   ├── Navbar.tsx                # Main navigation bar
+│   ├── SEO.tsx                   # SEO metadata component
+│   └── ScrollToTop.tsx           # Utility component
+├── facilities/
+│   ├── FacilityCard.tsx          # Card for facility listings
+│   ├── FacilityDetail.tsx        # Detailed facility view
+│   ├── FacilityGallery.tsx       # Image gallery component
+│   ├── FacilityMap.tsx           # Map with facility location
+│   ├── FacilityReviews.tsx       # Reviews display component
+│   ├── FacilityFilterBar.tsx     # Filtering options
+│   ├── FacilitySearchBar.tsx     # Search component
+│   └── FacilitySorter.tsx        # Sorting control
+├── cities/
+│   ├── CityCard.tsx              # City selection card
+│   ├── CityHeader.tsx            # City page header
+│   ├── CityStats.tsx             # Statistics display
+│   ├── CityResourceList.tsx      # City-specific resources
+│   └── CityMap.tsx               # Map of city with facilities
+├── resources/
+│   ├── ResourceCard.tsx          # Resource information card
+│   ├── ResourceCategorySelector.tsx # Category tabs
+│   └── ResourceList.tsx          # List of resources
+├── quiz/
+│   ├── QuizForm.tsx              # Multi-step quiz form
+│   ├── QuizProgress.tsx          # Progress indicator
+│   └── QuizResults.tsx           # Results preview
+├── ai/
+│   ├── ChatInterface.tsx         # AI chat UI
+│   ├── MessageBubble.tsx         # Message display
+│   └── SuggestionBubble.tsx      # Suggestion chips
+└── ui/                           # Shadcn UI components
+    ├── button.tsx
+    ├── input.tsx
+    ├── select.tsx
+    ├── checkbox.tsx
+    ├── card.tsx
+    ├── form.tsx
+    ├── toast.tsx
+    └── ...other UI primitives
+Page Structure
+/client/pages/
+├── HomePage.tsx                  # Landing page
+├── FacilitiesPage.tsx            # All facilities listing
+├── FacilityDetailPage.tsx        # Single facility view
+├── CityPage.tsx                  # City-specific page
+├── ResourcesPage.tsx             # Resources library
+├── QuizPage.tsx                  # Care finder quiz
+├── AboutPage.tsx                 # About us page
+├── ContactPage.tsx               # Contact page
+├── AiChatPage.tsx                # AI assistant
+├── SearchResultsPage.tsx         # Search results
+├── PrivacyPolicyPage.tsx         # Privacy policy
+└── TermsOfServicePage.tsx        # Terms of service
+Frontend Routing Structure
+// from App.tsx
+function App() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow">
+        <ErrorBoundary fallback={<ErrorPage />}>
+          <Switch>
+            <Route path="/" component={HomePage} />
+            
+            {/* Facility Routes */}
+            <Route path="/facilities" component={FacilitiesPage} />
+            <Route path="/facilities/:id" component={FacilityDetailPage} />
+            
+            {/* City Routes */}
+            <Route path="/cities" component={CitiesPage} />
+            <Route path="/cities/:slug" component={CityPage} />
+            <Route path="/cities/:slug/:serviceType" component={CityServiceTypePage} />
+            
+            {/* Resource Routes */}
+            <Route path="/resources" component={ResourcesPage} />
+            <Route path="/resources/:category" component={ResourceCategoryPage} />
+            <Route path="/cities/:slug/resources/:resourceType" component={CityResourcesPage} />
+            
+            {/* Quiz Routes */}
+            <Route path="/quiz" component={QuizPage} />
+            <Route path="/quiz/results" component={QuizResultsPage} />
+            
+            {/* Static Pages */}
+            <Route path="/about" component={AboutPage} />
+            <Route path="/contact" component={ContactPage} />
+            <Route path="/privacy" component={PrivacyPolicyPage} />
+            <Route path="/terms" component={TermsOfServicePage} />
+            
+            {/* AI Chat */}
+            <Route path="/ai-assistant" component={AiChatPage} />
+            
+            {/* Search */}
+            <Route path="/search" component={SearchResultsPage} />
+            
+            {/* 404 */}
+            <Route component={NotFoundPage} />
+          </Switch>
+        </ErrorBoundary>
+      </main>
+      <Footer />
+      <Toaster />
+    </div>
+  );
+}
+Example API Query Hook Implementation
+// Custom hook for facility data
+function useFacility(id: number | string) {
+  return useQuery({
+    queryKey: ['/api/facilities', id],
+    queryFn: async () => {
+      const response = await fetch(`/api/facilities/${id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch facility data');
+      }
+      return response.json();
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+// Custom hook for facilities with filtering
+function useFacilities(options: { 
+  type?: string; 
+  city?: string; 
+  isFeatured?: boolean;
+  search?: string;
+  rating?: number;
+  sort?: string;
+  relevant?: boolean;
+}) {
+  const queryParams = new URLSearchParams();
+  
+  // Add query parameters
+  if (options.type) queryParams.append('type', options.type);
+  if (options.city) queryParams.append('city', options.city);
+  if (options.isFeatured) queryParams.append('isFeatured', 'true');
+  if (options.search) queryParams.append('search', options.search);
+  if (options.rating) queryParams.append('rating', options.rating.toString());
+  if (options.sort) queryParams.append('sort', options.sort);
+  if (options.relevant) queryParams.append('relevant', 'true');
+  
+  const queryString = queryParams.toString();
+  
+  return useQuery({
+    queryKey: ['/api/facilities', options],
+    queryFn: async () => {
+      const response = await fetch(`/api/facilities${queryString ? `?${queryString}` : ''}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch facilities');
+      }
+      return response.json();
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+// Custom hook for city data
+function useCity(slug: string) {
+  return useQuery({
+    queryKey: ['/api/cities', slug],
+    queryFn: async () => {
+      const response = await fetch(`/api/cities/${slug}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch city data');
+      }
+      return response.json();
+    },
+    enabled: !!slug,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+// Custom hook for city resources
+function useCityResources(citySlug: string, resourceType: string) {
+  return useQuery({
+    queryKey: ['/api/cities', citySlug, 'resources', resourceType],
+    queryFn: async () => {
+      const response = await fetch(`/api/cities/${citySlug}/resources/${resourceType}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch city resources');
+      }
+      return response.json();
+    },
+    enabled: !!citySlug && !!resourceType,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+  });
+}
+External Services Integration
+Claude AI (Anthropic)
+API Key: Stored in environment variable ANTHROPIC_API_KEY
+Model: Claude 3 Opus
+Temperature: 0.7 (balanced between creativity and accuracy)
+Max tokens: 4096 for standard responses, 1024 for short descriptions
+Implementation Example:
+
+export async function generateFacilityDescription(facilityData: {
+  name: string;
+  serviceType: string;
+  amenities: string[];
+  city: string;
+  state: string;
+  shortDescription?: string;
+}): Promise<string> {
+  const anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  });
+  
+  const prompt = `Generate a detailed, engaging description for a senior care facility based on the following information:
+  
+  Name: ${facilityData.name}
+  Type: ${facilityData.serviceType}
+  City: ${facilityData.city}, ${facilityData.state}
+  Amenities: ${facilityData.amenities.join(', ')}
+  Brief description: ${facilityData.shortDescription || ''}
+  
+  Please write approximately 150-200 words highlighting the facility's advantages, environment, and care philosophy. Focus on what makes this place special for seniors. Use a warm, reassuring tone without exaggeration.`;
+  
+  try {
+    const response = await anthropic.messages.create({
+      model: "claude-3-opus-20240229",
+      max_tokens: 4096,
+      temperature: 0.7,
+      messages: [{ role: "user", content: prompt }],
+    });
+    
+    return response.content[0].text;
+  } catch (error) {
+    console.error("Error generating facility description:", error);
+    return `${facilityData.name} is a ${facilityData.serviceType.toLowerCase()} facility located in ${facilityData.city}, ${facilityData.state}. Contact the facility directly for more information about their services and amenities.`;
+  }
+}
+Screenshot Services
+The application uses a tiered approach to image generation:
+
+GetScreenshot API
+
+API Key: Stored in GETSCREENSHOT_API_KEY
+Endpoint: https://api.getscreenshot.io/snapshot
+Parameters: url, width, height, device, format
+ScreenshotOne API (Fallback)
+
+API Key: Stored in SCREENSHOTONE_API_KEY
+Endpoint: https://api.screenshotone.com/take
+Parameters: url, access_key, viewport_width, viewport_height
+Puppeteer (Last Resort)
+
+Local screenshot generation using headless Chrome
+Implementation Example:
+
+async function captureScreenshot(websiteUrl: string, maxRetries: number = 2): Promise<Buffer | null> {
+  const normalizedUrl = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
+  
+  // Try GetScreenshot API first
+  try {
+    return await retryService(
+      async () => {
+        const params = new URLSearchParams({
+          url: normalizedUrl,
+          width: "1280",
+          height: "800",
+          device: "desktop",
+          format: "png",
+          access_key: process.env.GETSCREENSHOT_API_KEY || ""
+        });
+        
+        const response = await fetch(`https://api.getscreenshot.io/snapshot?${params}`);
+        if (!response.ok) throw new Error(`GetScreenshot API failed: ${response.status}`);
+        
+        return Buffer.from(await response.arrayBuffer());
+      },
+      'GetScreenshot'
+    );
+  } catch (err) {
+    console.warn(`GetScreenshot failed: ${err.message}, trying ScreenshotOne...`);
+  }
+  
+  // Try ScreenshotOne API as first fallback
+  try {
+    return await retryService(
+      async () => await captureScreenshotOne(normalizedUrl),
+      'ScreenshotOne'
+    );
+  } catch (err) {
+    console.warn(`ScreenshotOne failed: ${err.message}, falling back to Puppeteer...`);
+  }
+  
+  // Use Puppeteer as last resort
+  try {
+    return await retryService(
+      async () => await capturePuppeteerScreenshot(normalizedUrl),
+      'Puppeteer'
+    );
+  } catch (err) {
+    console.error(`All screenshot methods failed for ${normalizedUrl}: ${err.message}`);
+    return null;
+  }
+}
+FireCrawl Image Extraction
+API Key: Stored in FIRECRAWL_API_KEY
+Endpoint: https://api.firecrawl.dev/v1/extract
+Parameters: url, type, maxImages
+Implementation Example:
+
+export async function extractImagesFromWebsite(
+  website: string,
+  facilityId: number,
+  maxImages: number = 5
+): Promise<string[]> {
+  if (!website) return [];
+  
+  const normalizedUrl = website.startsWith('http') ? website : `https://${website}`;
+  
+  try {
+    const response = await fetch('https://api.firecrawl.dev/v1/extract', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.FIRECRAWL_API_KEY}`
+      },
+      body: JSON.stringify({
+        url: normalizedUrl,
+        type: 'image',
+        maxImages: maxImages
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`FireCrawl API error: ${response.status}`);
+    }
+    
+    const data: ExtractedImages = await response.json();
+    
+    // Filter to remove icons, logos, etc.
+    const filteredImages = filterImageUrls(data.images);
+    
+    // Store in database
+    await storeExtractedImages(facilityId, filteredImages);
+    
+    return filteredImages;
+  } catch (error) {
+    console.error(`Failed to extract images for facility ${facilityId}:`, error);
+    return [];
+  }
+}
