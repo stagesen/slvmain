@@ -42,10 +42,10 @@ const ServiceTypeCards = () => {
                 key={type.id}
                 className="bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 text-center"
               >
-                <div className="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-8 w-8 text-primary-600"
+                    className="h-8 w-8 text-primary"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -63,7 +63,7 @@ const ServiceTypeCards = () => {
                 <p className="text-sm text-gray-500 mb-4">{type.priceRange}</p>
                 <Link
                   href={`/facilities?type=${type.id}`}
-                  className="text-primary-600 font-medium hover:text-primary-700 inline-flex items-center"
+                  className="text-primary font-medium hover:text-primary/80 inline-flex items-center"
                 >
                   Learn More
                   <svg

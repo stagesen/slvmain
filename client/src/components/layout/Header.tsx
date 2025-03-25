@@ -24,7 +24,7 @@ const Header = () => {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-          <Home className="h-8 w-8 text-primary-600" />
+          <Home className="h-8 w-8 text-primary" />
           <span className="text-xl font-bold text-gray-900">SeniorLivingColorado</span>
         </Link>
 
@@ -36,15 +36,15 @@ const Header = () => {
               href={link.path}
               className={`font-medium ${
                 isActive(link.path)
-                  ? "text-primary-600"
-                  : "text-gray-700 hover:text-primary-600"
+                  ? "text-primary"
+                  : "text-gray-700 hover:text-primary"
               }`}
             >
               {link.name}
             </Link>
           ))}
           <Link href="/ai-assistant">
-            <Button className="bg-primary-600 hover:bg-primary-700">
+            <Button>
               AI Assistant
             </Button>
           </Link>
@@ -74,7 +74,7 @@ const Header = () => {
                     href={link.path}
                     className={`py-2 px-4 rounded-md font-medium ${
                       isActive(link.path)
-                        ? "bg-primary-50 text-primary-600"
+                        ? "bg-primary/10 text-primary"
                         : "text-gray-700 hover:bg-gray-100"
                     }`}
                     onClick={() => setIsOpen(false)}
@@ -84,7 +84,7 @@ const Header = () => {
                 ))}
                 <Link
                   href="/ai-assistant"
-                  className="py-2 px-4 rounded-md font-medium bg-primary-600 text-white hover:bg-primary-700 text-center mt-4"
+                  className="py-2 px-4 rounded-md font-medium bg-primary text-primary-foreground hover:bg-primary/90 text-center mt-4"
                   onClick={() => setIsOpen(false)}
                 >
                   AI Assistant
