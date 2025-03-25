@@ -12,7 +12,7 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Gets a human-readable name for a service type
  */
-export function getServiceTypeName(serviceType: ServiceType): string {
+export function getServiceTypeName(serviceType: ServiceType | string): string {
   const typeNameMap: Record<ServiceType, string> = {
     ASSISTED_LIVING: "Assisted Living",
     MEMORY_CARE: "Memory Care",
@@ -26,7 +26,7 @@ export function getServiceTypeName(serviceType: ServiceType): string {
     REHABILITATION: "Rehabilitation",
   };
 
-  return typeNameMap[serviceType] || serviceType.replace("_", " ");
+  return typeNameMap[serviceType as ServiceType] || String(serviceType).replace("_", " ");
 }
 
 /**

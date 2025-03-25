@@ -32,8 +32,8 @@ const FeaturedFacilities = () => {
 
         {/* Filters */}
         <div className="mb-8 flex justify-center">
-          <Tabs defaultValue="" value={activeFilter} onValueChange={setActiveFilter}>
-            <TabsList>
+          <Tabs defaultValue="" value={activeFilter} onValueChange={setActiveFilter} className="w-full max-w-2xl">
+            <TabsList className="w-full justify-between">
               <TabsTrigger value="">All Types</TabsTrigger>
               <TabsTrigger value={ServiceType.ASSISTED_LIVING}>Assisted Living</TabsTrigger>
               <TabsTrigger value={ServiceType.MEMORY_CARE}>Memory Care</TabsTrigger>
