@@ -165,7 +165,7 @@ const Facilities = () => {
             </div>
           ) : facilities.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {facilities.map((facility) => (
+              {facilities.map((facility: any) => (
                 <FacilityCard key={facility.id} facility={facility} />
               ))}
             </div>

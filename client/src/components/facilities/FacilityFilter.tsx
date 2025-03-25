@@ -152,7 +152,7 @@ const FacilityFilter = ({ initialFilters, onFilterChange }: FacilityFilterProps)
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Cities</SelectItem>
-                    {cities.map((city) => (
+                    {Array.isArray(cities) && cities.map((city: any) => (
                       <SelectItem key={city.slug} value={city.slug}>
                         {city.name}
                       </SelectItem>
@@ -174,7 +174,7 @@ const FacilityFilter = ({ initialFilters, onFilterChange }: FacilityFilterProps)
                     <RadioGroupItem value="all" id="all-types" />
                     <Label htmlFor="all-types">All Types</Label>
                   </div>
-                  {serviceTypes.map((type) => (
+                  {Array.isArray(serviceTypes) && serviceTypes.map((type: any) => (
                     <div key={type.id} className="flex items-center space-x-2">
                       <RadioGroupItem value={type.id} id={type.id} />
                       <Label htmlFor={type.id}>{type.name}</Label>

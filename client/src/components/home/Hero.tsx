@@ -60,7 +60,7 @@ const Hero = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Colorado Cities</SelectItem>
-                    {cities.map((city) => (
+                    {Array.isArray(cities) && cities.map((city: any) => (
                       <SelectItem key={city.slug} value={city.slug}>
                         {city.name}
                       </SelectItem>
@@ -82,7 +82,7 @@ const Hero = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Care Types</SelectItem>
-                    {serviceTypes.map((type: ServiceTypeInfo) => (
+                    {Array.isArray(serviceTypes) && serviceTypes.map((type: any) => (
                       <SelectItem key={type.id} value={type.id}>
                         {type.name}
                       </SelectItem>

@@ -22,9 +22,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Facilities endpoints
   app.get("/api/facilities", async (req: Request, res: Response) => {
     try {
+      // Filter out 'all' values as they mean no filter should be applied
       const filters = {
-        city: req.query.city as string,
-        serviceType: req.query.type as ServiceType,
+        city: req.query.city && req.query.city !== 'all' ? req.query.city as string : undefined,
+        serviceType: req.query.type && req.query.type !== 'all' ? req.query.type as ServiceType : undefined,
         search: req.query.search as string,
         amenities: req.query.amenities ? (req.query.amenities as string).split(',') : undefined,
         rating: req.query.rating ? parseInt(req.query.rating as string) : undefined,
@@ -172,7 +173,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/cities/:slug/facilities", async (req: Request, res: Response) => {
     try {
-      const serviceType = req.query.type as ServiceType | undefined;
+      const serviceType = req.query.type && req.query.type !== 'all' 
+        ? req.query.type as ServiceType 
+        : undefined;
       const facilities = await storage.getFacilitiesByCity(req.params.slug, serviceType);
       res.json(facilities);
     } catch (error) {
@@ -283,8 +286,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Find matching facilities based on quiz answers
       const matchedFacilities = await storage.getFacilities({
-        city: leadData.locationPreference,
-        serviceType: leadData.careType as ServiceType,
+        city: leadData.locationPreference && leadData.locationPreference !== 'all' 
+          ? leadData.locationPreference 
+          : undefined,
+        serviceType: leadData.careType && leadData.careType !== 'all' 
+          ? leadData.careType as ServiceType 
+          : undefined,
       });
       
       res.status(201).json({ lead, matchedFacilities });
