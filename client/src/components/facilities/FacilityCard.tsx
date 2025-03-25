@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getServiceTypeName } from "@/lib/utils";
+import { ServiceType } from "@shared/schema";
 
 interface FacilityCardProps {
   facility: Facility;
@@ -27,7 +28,7 @@ const FacilityCard = ({ facility }: FacilityCardProps) => {
   } = facility;
 
   // Get up to 3 amenities for display
-  const displayAmenities = amenities.slice(0, 3);
+  const displayAmenities = amenities?.slice(0, 3) || [];
 
   // Format pricing information
   const getPriceDisplay = () => {
@@ -52,11 +53,11 @@ const FacilityCard = ({ facility }: FacilityCardProps) => {
           alt={`${name} facility`}
           className="w-full h-48 object-cover rounded-t-lg"
         />
-        <Badge className="absolute top-3 left-3 bg-primary-600">
+        <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">
           {getServiceTypeName(serviceType)}
         </Badge>
         {isFeatured && (
-          <Badge variant="secondary" className="absolute top-3 right-3 bg-amber-500 text-white">
+          <Badge variant="secondary" className="absolute top-3 right-3">
             Featured
           </Badge>
         )}

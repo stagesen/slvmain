@@ -4,7 +4,7 @@ import { ServiceTypeInfo } from "@shared/types";
 import { fetchServiceTypes } from "@/lib/api";
 
 const ServiceTypeCards = () => {
-  const { data: serviceTypes = [], isLoading } = useQuery({
+  const { data: serviceTypes = [], isLoading } = useQuery<ServiceTypeInfo[]>({
     queryKey: ["/api/service-types"],
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
