@@ -4,48 +4,63 @@ import { Bot, ArrowRight, CheckCircle, SendHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const AIAssistantPreview = () => {
+interface AIAssistantPreviewProps {
+  minimized?: boolean;
+}
+
+const AIAssistantPreview = ({ minimized = false }: AIAssistantPreviewProps) => {
   const [inputValue, setInputValue] = useState("");
 
   return (
-    <section id="chat" className="py-12 md:py-16 bg-primary-600 text-white">
+    <section id="chat" className={`py-12 md:py-16 ${minimized ? 'bg-gray-50' : 'bg-primary-600 text-white'}`}>
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
-            <div className="lg:col-span-3">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                Get Personalized Care Recommendations
-              </h2>
-              <p className="text-white text-opacity-90 mb-6">
-                Our AI assistant can help you navigate senior care options based on your specific needs, preferences, and budget.
+          {minimized ? (
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">AI-Powered Care Recommendations</h2>
+              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                Get personalized care suggestions based on your specific needs with our intelligent assistant
               </p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start">
-                  <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-90 mt-0.5" />
-                  <span>Answer a few questions about care needs</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-90 mt-0.5" />
-                  <span>Get matched with relevant facilities</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-90 mt-0.5" />
-                  <span>Learn about care options in plain language</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-90 mt-0.5" />
-                  <span>Connect with local resources in your area</span>
-                </li>
-              </ul>
-              <Link href="/ai-assistant">
-                <Button variant="secondary" className="px-6 py-3 text-primary-700 hover:bg-gray-100">
-                  Chat with Our AI Assistant
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
             </div>
+          ) : null}
+          
+          <div className={`grid grid-cols-1 ${minimized ? 'lg:grid-cols-3' : 'lg:grid-cols-5'} gap-8 items-center`}>
+            {!minimized && (
+              <div className="lg:col-span-3">
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                  Get Personalized Care Recommendations
+                </h2>
+                <p className="text-white text-opacity-90 mb-6">
+                  Our AI assistant can help you navigate senior care options based on your specific needs, preferences, and budget.
+                </p>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-90 mt-0.5" />
+                    <span>Answer a few questions about care needs</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-90 mt-0.5" />
+                    <span>Get matched with relevant facilities</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-90 mt-0.5" />
+                    <span>Learn about care options in plain language</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-90 mt-0.5" />
+                    <span>Connect with local resources in your area</span>
+                  </li>
+                </ul>
+                <Link href="/ai-assistant">
+                  <Button variant="secondary" className="px-6 py-3 text-primary-700 hover:bg-gray-100">
+                    Chat with Our AI Assistant
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            )}
             
-            <div className="lg:col-span-2">
+            <div className={minimized ? "lg:col-span-3 mx-auto max-w-md w-full" : "lg:col-span-2"}>
               <div className="bg-white rounded-lg shadow-xl p-4 text-gray-800">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-900">Care Assistant</h3>
@@ -95,6 +110,17 @@ const AIAssistantPreview = () => {
                   </div>
                 </div>
               </div>
+              
+              {minimized && (
+                <div className="text-center mt-6">
+                  <Link href="/ai-assistant">
+                    <Button className="px-6 py-3">
+                      Start a Full Conversation
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
